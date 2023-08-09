@@ -1,6 +1,6 @@
 <?php
 
-class SignupContr
+class SignupContr extends Signup
 {
 
     private $uid;
@@ -16,28 +16,30 @@ class SignupContr
         $this->email = $email;
     }
 
-    private function signupUser()
+    public function signupUser()
     {
         if ($this->emptyInput() == false) {
             header("location ../index.php?error=emptyinput");
             exit();
         }
         if ($this->invalidUid() == false) {
-            header("location ../index.php?error=emptyinput");
+            header("location ../index.php?error=username");
             exit();
         }
         if ($this->invalidEmail() == false) {
-            header("location ../index.php?error=emptyinput");
+            header("location ../index.php?error=email");
             exit();
         }
         if ($this->pwdMatch() == false) {
-            header("location ../index.php?error=emptyinput");
+            header("location ../index.php?error=passwordmatch");
             exit();
         }
         if ($this->uidTakenCheck() == false) {
-            header("location ../index.php?error=emptyinput");
+            header("location ../index.php?error=useroremailtaken");
             exit();
         }
+
+        $this->setUser($this->uid, $this->pwd, $this->email);
     }
 
     private function emptyInput()

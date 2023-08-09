@@ -12,7 +12,7 @@
         <div class="wrapper">
             <div class="index-login-signup">
                 <h4>SIGN UP</h4>
-                <form action="includes/signup.inc.php" method="post">
+                <form action="includes/signup.php" method="post">
                     <input type="text" name="uid" placeholder="username">
                     <input type="password" name="pwd" placeholder="password">
                     <input type="password" name="pwdrepeat" placeholder="repeat password">
@@ -24,7 +24,7 @@
 
             <div class="index-login-login">
                 <h4>LOGIN</h4>
-                <form action="includes/login.inc.php" method="post">
+                <form action="includes/login.php" method="post">
                     <input type="text" name="uid" placeholder="username">
                     <input type="password" name="pwd" placeholder="password">
                     <br>
