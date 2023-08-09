@@ -14,7 +14,30 @@ class SignupContr
         $this->pwd = $pwd;
         $this->pwdRepeat = $pwdRepeat;
         $this->email = $email;
+    }
 
+    private function signupUser()
+    {
+        if ($this->emptyInput() == false) {
+            header("location ../index.php?error=emptyinput");
+            exit();
+        }
+        if ($this->invalidUid() == false) {
+            header("location ../index.php?error=emptyinput");
+            exit();
+        }
+        if ($this->invalidEmail() == false) {
+            header("location ../index.php?error=emptyinput");
+            exit();
+        }
+        if ($this->pwdMatch() == false) {
+            header("location ../index.php?error=emptyinput");
+            exit();
+        }
+        if ($this->uidTakenCheck() == false) {
+            header("location ../index.php?error=emptyinput");
+            exit();
+        }
     }
 
     private function emptyInput()
@@ -37,10 +60,32 @@ class SignupContr
         }
         return $result;
     }
-    private function invaliduid()
+    private function invaliduId()
     {
         $result = false;
         if (!filter_var(!preg_match("/^[a-zA-Z0-9]*$/", $this->uid))) {
+            $result = false;
+        } else {
+            $result = true;
+        }
+        return $result;
+    }
+
+    private function pwdMatch()
+    {
+        $result = false;
+        if ($this->pwd !== $this->pwdRepeat) {
+            $result = false;
+        } else {
+            $result = true;
+        }
+        return $result;
+    }
+
+    private function uidTakenCheck()
+    {
+        $result = false;
+        if ($this->checkUser($this->uid, $this->email)) {
             $result = false;
         } else {
             $result = true;
