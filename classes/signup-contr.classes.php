@@ -18,23 +18,28 @@ class SignupContr extends Signup
 
     public function signupUser()
     {
-        if ($this->emptyInput() == false) {
+        if ($this->emptyInput()) {
+            echo "<script>console.log('emptyInput');</script>";
             header("location ../index.php?error=emptyinput");
             exit();
         }
-        if ($this->invalidUid() == false) {
+        if ($this->invalidUid()) {
+            echo "<script>console.log('invalidUid');</script>";
             header("location ../index.php?error=username");
             exit();
         }
-        if ($this->invalidEmail() == false) {
+        if ($this->invalidEmail()) {
+            echo "<script>console.log('invalidEmail');</script>";
             header("location ../index.php?error=email");
             exit();
         }
-        if ($this->pwdMatch() == false) {
+        if ($this->pwdNotMatch()) {
+            echo "<script>console.log('pwdNotMatch');</script>";
             header("location ../index.php?error=passwordmatch");
             exit();
         }
-        if ($this->uidTakenCheck() == false) {
+        if ($this->uidTakenCheck()) {
+            echo "<script>console.log('uidTakenCheck');</script>";
             header("location ../index.php?error=useroremailtaken");
             exit();
         }
@@ -44,55 +49,53 @@ class SignupContr extends Signup
 
     private function emptyInput()
     {
-        $result = false;
         if (empty($this->uid) || empty($this->pwd) || empty($this->pwdRepeat) || empty($this->email)) {
-            $result = false;
+            return true;
         } else {
-            $result = true;
+            return false;
         }
-        return $result;
+    }
+    private function invalidUid()
+    {
+        if (!preg_match("/^[a-zA-Z0-9]*$/", $this->uid)) {
+            return true;
+        } else {
+            return false;
+        }
     }
     private function invalidEmail()
     {
-        $result = false;
         if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-            $result = false;
+            return true;
         } else {
-            $result = true;
+            return false;
         }
-        return $result;
     }
-    private function invaliduId()
+    private function pwdNotMatch()
     {
-        $result = false;
-        if (!filter_var(!preg_match("/^[a-zA-Z0-9]*$/", $this->uid))) {
-            $result = false;
-        } else {
-            $result = true;
-        }
-        return $result;
-    }
-
-    private function pwdMatch()
-    {
-        $result = false;
         if ($this->pwd !== $this->pwdRepeat) {
-            $result = false;
+            return true;
         } else {
-            $result = true;
+            return false;
         }
-        return $result;
     }
 
     private function uidTakenCheck()
     {
-        $result = false;
-        if ($this->checkUser($this->uid, $this->email)) {
-            $result = false;
+        if ($this->checkUidTaken($this->uid)) {
+            return true;
         } else {
-            $result = true;
+            return false;
         }
-        return $result;
+    }
+
+    private function emailTakenCheck()
+    {
+        if ($this->checkEmailTaken($this->email)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

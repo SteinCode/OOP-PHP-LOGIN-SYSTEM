@@ -13,27 +13,37 @@ class Signup extends Dbh
             header("location: ../index.php?error=stmtfailed");
             exit();
         }
-
         $statement = null;
     }
-    protected function checkUser($uid, $email)
+    protected function checkUidTaken($uid)
     {
-        $statement = $this->connect()->prepare('SELECT users_id FROM users WHERE users_uid = ? OR users_email = ?;');
+        $statement = $this->connect()->prepare('SELECT users_uid FROM users WHERE users_uid = ?;');
 
-        if (!$statement->execute(array($uid, $email))) {
+        if (!$statement->execute($uid)) {
             $statement = null;
             header("location: ../index.php?error=stmtfailed");
             exit();
         }
-        $resultCheck = false;
         if ($statement->rowCount() > 0) {
-            $resultCheck = false;
+            return true;
         } else {
-            $resultCheck = true;
+            return false;
         }
-        return $resultCheck;
     }
 
+    protected function checkEmailTaken($email)
+    {
+        $statement = $this->connect()->prepare('SELECT users_email FROM users WHERE users_email = ?;');
 
-
+        if (!$statement->execute($email)) {
+            $statement = null;
+            header("location: ../index.php?error=stmtfailed");
+            exit();
+        }
+        if ($statement->rowCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
