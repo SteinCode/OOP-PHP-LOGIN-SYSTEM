@@ -19,7 +19,7 @@ class Signup extends Dbh
     {
         $statement = $this->connect()->prepare('SELECT users_uid FROM users WHERE users_uid = ?;');
 
-        if (!$statement->execute($uid)) {
+        if (!$statement->execute([$uid])) {
             $statement = null;
             header("location: ../index.php?error=stmtfailed");
             exit();
@@ -35,7 +35,7 @@ class Signup extends Dbh
     {
         $statement = $this->connect()->prepare('SELECT users_email FROM users WHERE users_email = ?;');
 
-        if (!$statement->execute($email)) {
+        if (!$statement->execute([$email])) {
             $statement = null;
             header("location: ../index.php?error=stmtfailed");
             exit();

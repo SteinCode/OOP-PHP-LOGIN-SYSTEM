@@ -40,7 +40,12 @@ class SignupContr extends Signup
         }
         if ($this->uidTakenCheck()) {
             echo "<script>console.log('uidTakenCheck');</script>";
-            header("location ../index.php?error=useroremailtaken");
+            header("location ../index.php?error=usertaken");
+            exit();
+        }
+        if ($this->emailTakenCheck()) {
+            echo "<script>console.log('emailTakenCheck');</script>";
+            header("location ../index.php?error=emailtaken");
             exit();
         }
 
