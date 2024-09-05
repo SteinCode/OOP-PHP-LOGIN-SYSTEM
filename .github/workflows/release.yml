@@ -5,6 +5,9 @@ on:
     types:
       - closed
 
+permissions:
+  contents: write # Grant write permissions to create releases
+
 jobs:
   release:
     if: github.event.pull_request.merged == true # Only run if the PR was merged
@@ -25,14 +28,14 @@ jobs:
         id: get_tag
         run: |
           TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
-          echo "::set-output name=TAG::$TAG"
+          echo "TAG=$TAG" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.get_tag.outputs.TAG }} # Use the latest tag
+          tag_name: ${{ env.TAG }} # Use the latest tag from the environment
           release_name: "Release for PR #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}" # Dynamic title from PR
           body: |
             ## Changelog
@@ -41,6 +44,6 @@ jobs:
             PR Description:
             ${{ github.event.pull_request.body }}
 
-            ### Automatic Release for version ${{ steps.get_tag.outputs.TAG }}
+            ### Automatic Release for version ${{ env.TAG }}
           draft: false
           prerelease: false
