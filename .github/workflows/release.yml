@@ -30,6 +30,20 @@ jobs:
           TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
           echo "TAG=$TAG" >> $GITHUB_ENV
 
+      - name: Create GitHub Release
+        id: create_release # Add an ID to reference in the next steps
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.TAG }} # Use the latest tag from the environment
+          release_name: "Release for PR #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}" # Dynamic title from PR
+          body: |
+            ## Changelog
+            ${{ github.event.pull_request.body }}
+          draft: false
+          prerelease: false
+
       - name: Create spectrocoin.zip
         run: |
           mkdir spectrocoin-accepting-bitcoin  # Create the folder inside the working directory
@@ -43,20 +57,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # Use the upload URL from the release creation step
           asset_path: spectrocoin.zip # The path to the zip file
           asset_name: spectrocoin.zip # Name of the zip file in the release
           asset_content_type: application/zip
-
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.TAG }} # Use the latest tag from the environment
-          release_name: "Release for PR #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}" # Dynamic title from PR
-          body: |
-            ## Changelog
-            ${{ github.event.pull_request.body }}
-          draft: false
-          prerelease: false
