@@ -1,0 +1,40 @@
+name: Create Release on PR Merge
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: main # Adjust this to your default branch if needed
+
+      - name: Set up Git
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Get the latest tag
+        id: get_tag
+        run: |
+          TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "::set-output name=TAG::$TAG"
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_tag.outputs.TAG }}
+          release_name: Release ${{ steps.get_tag.outputs.TAG }}
+          body: |
+            Automatically generated release for version ${{ steps.get_tag.outputs.TAG }}.
+          draft: false
+          prerelease: false
