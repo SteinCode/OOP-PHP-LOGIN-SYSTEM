@@ -7,14 +7,14 @@ on:
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true # Only run if the PR was merged
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          ref: main # Adjust this to your default branch if needed
+          fetch-depth: 0 # Fetch full history to include tags
 
       - name: Set up Git
         run: |
@@ -32,9 +32,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.get_tag.outputs.TAG }}
-          release_name: Release ${{ steps.get_tag.outputs.TAG }}
+          tag_name: ${{ steps.get_tag.outputs.TAG }} # Use the latest tag
+          release_name: "Release for PR #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}" # Dynamic title from PR
           body: |
-            Automatically generated release for version ${{ steps.get_tag.outputs.TAG }}.
+            ## Changelog
+            PR Title: ${{ github.event.pull_request.title }}
+
+            PR Description:
+            ${{ github.event.pull_request.body }}
+
+            ### Automatic Release for version ${{ steps.get_tag.outputs.TAG }}
           draft: false
           prerelease: false
