@@ -24,11 +24,22 @@ jobs:
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
 
-      - name: Get the latest tag
-        id: get_tag
+      - name: Get PR Title and Create Tag
+        id: create_tag
         run: |
-          TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
-          echo "TAG=$TAG" >> $GITHUB_ENV
+          # Get the pull request title
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "Pull Request Title: $PR_TITLE"
+
+          # Use the PR title as the new tag
+          TAG_NAME=$PR_TITLE
+
+          # Create the tag using the PR title
+          git tag "$TAG_NAME"
+          git push origin "$TAG_NAME"
+
+          # Store the tag in the environment
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         id: create_release # Add an ID to reference in the next steps
@@ -36,10 +47,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.TAG }} # Use the latest tag from the environment
+          tag_name: ${{ env.TAG_NAME }} # Use the tag created from the PR title
           release_name: "${{ github.event.pull_request.title }}" # Dynamic title from PR
           body: |
-            ## Changelog
             ${{ github.event.pull_request.body }}
           draft: false
           prerelease: false
@@ -48,7 +58,7 @@ jobs:
         run: |
           mkdir spectrocoin-accepting-bitcoin  # Create the folder inside the working directory
           # Copy only the necessary files and exclude the folder and unwanted files
-          find . -maxdepth 1 ! -name 'spectrocoin-accepting-bitcoin' ! -name '.' ! -name '.git' ! -name 'README.txt' ! -name 'README.md' ! -name 'changelog.md' ! -name '.gitignore' -exec cp -r {} spectrocoin-accepting-bitcoin/ \;
+          find . -maxdepth 1 ! -name 'spectrocoin-accepting-bitcoin' ! -name '.' ! -name '.git' ! -name '.github' ! -name 'README.txt' ! -name 'README.md' ! -name 'changelog.md' ! -name '.gitignore' -exec cp -r {} spectrocoin-accepting-bitcoin/ \;
           zip -r spectrocoin.zip spectrocoin-accepting-bitcoin  # Zip the folder
         shell: bash
 
